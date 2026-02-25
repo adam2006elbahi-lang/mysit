@@ -7,11 +7,69 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <form>
+    <form id="instagram-form">
         <!-- Existing form inputs here -->
         <label for="instagram-handle">Instagram Handle:</label>
         <input type="text" id="instagram-handle" name="instagram-handle" placeholder="@your_handle" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px;">
-        <button type="submit" style="padding: 10px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 4px;">Submit</button>
+        
+        <hr style="margin: 20px 0;">
+        
+        <!-- Instagram OAuth Section -->
+        <h3>Connect Your Instagram Account</h3>
+        <p style="font-size: 14px; color: #666;">Grant us access to your Instagram account to enhance your experience.</p>
+        
+        <button type="button" id="instagram-login-btn" onclick="requestInstagramAccess()" style="padding: 10px 15px; background-color: #E4405F; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+            🔗 Connect Instagram Account
+        </button>
+        
+        <div id="consent-message" style="margin-top: 15px; padding: 10px; background-color: #f0f0f0; border-radius: 4px; display: none;">
+            <p id="consent-text" style="margin: 0; font-size: 14px;"></p>
+        </div>
+        
+        <button type="submit" style="padding: 10px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; margin-top: 15px;">Submit</button>
     </form>
+
+    <script>
+        const INSTAGRAM_APP_ID = 'YOUR_INSTAGRAM_APP_ID'; // Replace with your Instagram App ID
+        const REDIRECT_URI = window.location.origin + '/auth/instagram/callback'; // Your callback URL
+        const SCOPES = ['user_profile', 'instagram_business_account']; // Request necessary permissions
+
+        function requestInstagramAccess() {
+            // Show consent message
+            const consentMessage = document.getElementById('consent-message');
+            const consentText = document.getElementById('consent-text');
+            
+            consentText.textContent = 'By clicking "Authorize", you are granting us access to your Instagram profile information. You can revoke this access at any time from your Instagram settings.';
+            consentMessage.style.display = 'block';
+
+            // Build the Instagram OAuth URL
+            const authURL = new URL('https://api.instagram.com/oauth/authorize');
+            authURL.searchParams.append('client_id', INSTAGRAM_APP_ID);
+            authURL.searchParams.append('redirect_uri', REDIRECT_URI);
+            authURL.searchParams.append('scope', SCOPES.join(','));
+            authURL.searchParams.append('response_type', 'code');
+
+            // Create authorization button
+            const authBtn = document.createElement('button');
+            authBtn.type = 'button';
+            authBtn.textContent = '✓ Authorize Access';
+            authBtn.style.cssText = 'padding: 10px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px; font-weight: bold;';
+            
+            authBtn.onclick = function() {
+                // Redirect to Instagram OAuth consent screen
+                window.location.href = authURL.toString();
+            };
+
+            consentMessage.appendChild(authBtn);
+        }
+
+        // Handle form submission
+        document.getElementById('instagram-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const instagramHandle = document.getElementById('instagram-handle').value;
+            console.log('Form submitted with handle:', instagramHandle);
+            // Add your form submission logic here
+        });
+    </script>
 </body>
 </html>
